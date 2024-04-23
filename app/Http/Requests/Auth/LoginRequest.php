@@ -27,11 +27,11 @@ class LoginRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'email' => ['required', 'string', 'email'],
+            'name' => ['required', 'string'],
             'password' => ['required', 'string'],
         ];
     }
-
+   
     /**
      * Attempt to authenticate the request's credentials.
      *
@@ -41,17 +41,28 @@ class LoginRequest extends FormRequest
     {
         $this->ensureIsNotRateLimited();
 
-        if (! Auth::attempt($this->only('email', 'password'), $this->boolean('remember'))) {
+        if (! Auth::attempt($this->only('name', 'password'), $this->boolean('remember'))) {
             RateLimiter::hit($this->throttleKey());
 
             throw ValidationException::withMessages([
-                'email' => trans('auth.failed'),
+                'name' => 'Invalid Credentials', // Customize this line
             ]);
         }
 
         RateLimiter::clear($this->throttleKey());
     }
+    public function messages()
+    {
 
+
+        return [
+            'name.required' => 'username is required',
+            'password.required' => 'password is required',
+        ];
+
+
+       
+    }
     /**
      * Ensure the login request is not rate limited.
      *
